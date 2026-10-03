@@ -7,6 +7,10 @@ requires-python = ">=3.10"
 license = { text = "MIT" }
 authors = [{ name = "Ehsan Razavi" }]
 
+[project.urls]
+Repository = "https://github.com/ehsrzv/comfyui-h3_temporal_tile"
+
 [tool.comfy]
-# ComfyUI-Manager metadata
-display_name = "H3 Temporal Tile"
+# ComfyUI-Manager metadata (PublisherId: replace with your registry.comfy.org publisher id)
+PublisherId = "YOUR_PUBLISHER_ID"
+DisplayName = "H3 Temporal Tile"
