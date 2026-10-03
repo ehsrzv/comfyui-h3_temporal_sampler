@@ -39,6 +39,8 @@ denoises each segment, and joins them seamlessly.
 
 **How it works**
 
+![How it works](assets/schematic.jpg)
+
 Each segment is sampled independently (one model init, shared across
 segments via equal-shape padding), then joined with the selected
 `blend_mode`. A per-boundary seam-quality report is printed (lower =
