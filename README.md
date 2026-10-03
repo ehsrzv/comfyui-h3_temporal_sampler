@@ -76,10 +76,32 @@ refresh the dropdown list.
 
 ## Installation
 
-1. Download the zip and extract it into `ComfyUI/custom_nodes/` so you get:
+### Option 1: Git clone (recommended)
+
+```bash
+cd ComfyUI/custom_nodes
+git clone https://github.com/ehsrzv/comfyui-h3_temporal_tile.git
+```
+
+Then restart ComfyUI.
+
+### Option 2: Download zip
+
+1. Download the zip from the
+   [releases page](https://github.com/ehsrzv/comfyui-h3_temporal_tile/releases)
+   (or the latest zip).
+2. Extract it into `ComfyUI/custom_nodes/` so you get:
    `ComfyUI/custom_nodes/comfyui-h3_temporal_tile/`
-2. Restart ComfyUI.
-3. Find the nodes under the **h3 temporal tile** category.
+3. Restart ComfyUI.
+
+### Option 3: ComfyUI Manager
+
+Search for `comfyui-h3_temporal_tile` in ComfyUI Manager and install.
+
+---
+
+After installation, find the nodes under the **h3 temporal tile** category.
+No extra dependencies — only ComfyUI itself and a MiniMax H3 setup.
 
 ## Requirements
 
