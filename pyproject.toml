@@ -11,6 +11,6 @@ authors = [{ name = "Ehsan Razavi" }]
 Repository = "https://github.com/ehsrzv/comfyui-h3_temporal_tile"
 
 [tool.comfy]
-# ComfyUI-Manager metadata (PublisherId: replace with your registry.comfy.org publisher id)
-PublisherId = "YOUR_PUBLISHER_ID"
+# ComfyUI-Manager metadata
+PublisherId = "ehsanrazavi"
 DisplayName = "H3 Temporal Tile"
