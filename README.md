@@ -1,4 +1,4 @@
-# Sampler Optimizer
+# H3 Temporal Sampler
 
 ComfyUI custom nodes for long-form MiniMax H3 video generation. Tile a long
 H3 audio-video latent into overlapping segments, denoise them consistently,
@@ -23,16 +23,16 @@ denoises each segment, and joins them seamlessly.
 | Widget | Type | Default | Notes |
 |---|---|---|---|
 | enable | BOOLEAN | True | OFF = one plain pass over the full latent, like SamplerCustomAdvanced. |
-| step_average | BOOLEAN | True | ON = MultiDiffusion-style per-step consensus (see below). OFF = sample each segment independently, then join with `blend_mode`. |
+| step_average | BOOLEAN | False | ON = MultiDiffusion-style per-step consensus (see below). OFF = sample each segment independently, then join with `blend_mode`. |
 | noise | NOISE | — | Full-length noise field; sliced per segment so overlaps share identical initial noise. |
 | guider | GUIDER | — | Conditioning guider, applied identically to every segment. |
 | sampler | SAMPLER | — | Sampler algorithm used for every segment. |
 | sigmas | SIGMAS | — | Sigma schedule; identical for every segment so the tiles match. |
 | latent_image | LATENT | — | Full-length H3 AV latent (nested video + audio). |
-| num_segments | INT | 2 | 1–10. How many overlapping time segments to split into. |
-| smart_bounds | BOOLEAN | False | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
+| num_segments | INT | 4 | 1–10. How many overlapping time segments to split into. |
+| smart_bounds | BOOLEAN | True | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
 | overlap_frames | INT | 10 | 5–20, snapped to multiples of 5. Overlap between neighbours. Larger = smoother joins, more compute. |
-| blend_mode | COMBO | linear | Join style for the final assembly in non-step-average mode: `linear` / `smoothstep` / `adaptive`. Disabled while `step_average` is ON. |
+| blend_mode | COMBO | adaptive | Join style for the final assembly in non-step-average mode: `linear` / `smoothstep` / `adaptive`. Disabled while `step_average` is ON. |
 
 **Outputs:** `output` (LATENT), `denoised_output` (LATENT)
 
