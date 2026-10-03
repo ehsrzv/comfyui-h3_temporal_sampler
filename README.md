@@ -23,7 +23,6 @@ denoises each segment, and joins them seamlessly.
 | Widget | Type | Default | Notes |
 |---|---|---|---|
 | enable | BOOLEAN | True | OFF = one plain pass over the full latent, like SamplerCustomAdvanced. |
-| step_average | BOOLEAN | False | ON = MultiDiffusion-style per-step consensus (see below). OFF = sample each segment independently, then join with `blend_mode`. |
 | noise | NOISE | — | Full-length noise field; sliced per segment so overlaps share identical initial noise. |
 | guider | GUIDER | — | Conditioning guider, applied identically to every segment. |
 | sampler | SAMPLER | — | Sampler algorithm used for every segment. |
@@ -32,22 +31,16 @@ denoises each segment, and joins them seamlessly.
 | num_segments | INT | 4 | 1–10. How many overlapping time segments to split into. |
 | smart_bounds | BOOLEAN | True | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
 | overlap_frames | INT | 10 | 5–20, snapped to multiples of 5. Overlap between neighbours. Larger = smoother joins, more compute. |
-| blend_mode | COMBO | adaptive | Join style for the final assembly in non-step-average mode: `linear` / `smoothstep` / `adaptive`. Disabled while `step_average` is ON. |
+| blend_mode | COMBO | adaptive | Join style for the final assembly: `linear` / `smoothstep` / `adaptive`. |
 
 **Outputs:** `output` (LATENT), `denoised_output` (LATENT)
 
 **How it works**
 
-- **step_average ON** (recommended): all segments advance one denoising step
-  at a time. After every step, the true overlap regions of neighbouring
-  segments are averaged with cosine-ramped weights and written back to both
-  sides, so the tiles converge to one consistent video instead of being
-  blended afterwards. Final assembly is a gentle linear join. The model is
-  held loaded across all steps (single init).
-- **step_average OFF**: each segment is sampled independently (one model
-  init, shared across segments via equal-shape padding), then joined with
-  the selected `blend_mode`. A per-boundary seam-quality report is printed
-  (lower = cleaner; `CHECK` flags scores ≥ 1.0).
+Each segment is sampled independently (one model init, shared across
+segments via equal-shape padding), then joined with the selected
+`blend_mode`. A per-boundary seam-quality report is printed (lower =
+cleaner; `CHECK` flags scores ≥ 1.0).
 
 **Notes**
 
@@ -55,8 +48,6 @@ denoises each segment, and joins them seamlessly.
   reference: 34 frames at 84×144); with `smart_bounds` off, raise
   `num_segments` if segments get too large for VRAM.
 - Overlap is reserved up front, so padded segments never exceed the cap.
-- H3 is a FLOW model: per-step noise inversion uses the CONST sampling
-  formula.
 
 ### H3 Latent Cache (Save/Load)
 
