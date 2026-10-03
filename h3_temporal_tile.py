@@ -712,3 +712,12 @@ class H3TemporalSampler:
               f"audio {tuple(ma.shape)}")
         return (out_latent, out_denoised)
 
+
+
+NODE_CLASS_MAPPINGS = {
+    "H3TemporalSampler": H3TemporalSampler,
+}
+
+NODE_DISPLAY_NAME_MAPPINGS = {
+    "H3TemporalSampler": "H3 Temporal Sampler",
+}
