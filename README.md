@@ -8,7 +8,9 @@ and cache latents between runs.
 
 > This node is designed both for extending video duration and for increasing
 > size up to 2K and beyond, but it increases render cost and is primarily
-> designed for working around VRAM limits.
+> designed for working around VRAM limits. In practice, the author has used
+> it to upscale up to 4K — more would be possible, but MiniMax gains little
+> from upscaling past that point.
 
 ## Nodes
 
