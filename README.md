@@ -53,6 +53,18 @@ cleaner; `CHECK` flags scores ≥ 1.0).
   `num_segments` if segments get too large for VRAM.
 - Overlap is reserved up front, so padded segments never exceed the cap.
 
+**Tuning segments for your hardware**
+
+`num_segments` is your main lever against VRAM exhaustion: more segments mean
+shorter segments, and shorter segments use less VRAM. If a render runs out of
+memory, raise `num_segments`; if every segment is comfortably small, lower it
+for a faster render.
+
+The trade-off is time: each extra segment adds its own denoising pass (plus
+overlap work), so total render time grows as the segment count grows. As a rule
+of thumb, use the fewest segments that still keep every segment under the VRAM
+cap — that is the shortest render your GPU can handle.
+
 ### H3 Latent Cache (Save/Load)
 
 Save and load H3 nested latents. ComfyUI's core Save/Load Latent nodes
@@ -70,7 +82,7 @@ dict with `torch.save` / `torch.load`, preserving the structure exactly.
 
 **Output:** `latent` (LATENT)
 
-Files are written as `<prefix>.h3latent.pt` into ComfyUI's output
+Files are written as `.h3latent.pt` into ComfyUI's output
 directory. After saving new files, re-add (or duplicate) the node to
 refresh the dropdown list.
 
