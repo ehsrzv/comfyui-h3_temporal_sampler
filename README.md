@@ -110,6 +110,12 @@ No extra dependencies — only ComfyUI itself and a MiniMax H3 setup.
 - The latent passed to H3 Temporal Sampler must be an H3 AV latent
   (nested video + audio samples)
 
+## Acknowledgments
+
+Example workflow based on the workflow templates from
+[LBH-123-AI/Minimax_h3_latent_Upscaler](https://huggingface.co/LBH-123-AI/Minimax_h3_latent_Upscaler)
+(Apache-2.0).
+
 ## License
 
 MIT
