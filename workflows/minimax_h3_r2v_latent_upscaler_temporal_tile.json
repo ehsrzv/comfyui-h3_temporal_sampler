@@ -2121,14 +2121,14 @@
       "widgets_values": [
         true,
         3,
-        true,
+        false,
         10,
         "adaptive"
       ],
       "widgets_values_named": {
         "enable": true,
         "num_segments": 3,
-        "smart_bounds": true,
+        "smart_bounds": false,
         "overlap_frames": 10,
         "blend_mode": "adaptive"
       }
@@ -2415,14 +2415,6 @@
       "MODEL"
     ],
     [
-      17,
-      19,
-      1,
-      12,
-      2,
-      "INT"
-    ],
-    [
       50,
       31,
       0,
@@ -2535,6 +2527,22 @@
       "LATENT"
     ],
     [
+      65,
+      41,
+      1,
+      43,
+      0,
+      "LATENT"
+    ],
+    [
+      66,
+      43,
+      0,
+      35,
+      0,
+      "LATENT"
+    ],
+    [
       3,
       34,
       0,
@@ -2575,22 +2583,6 @@
       "IMAGE"
     ],
     [
-      35,
-      35,
-      0,
-      26,
-      0,
-      "LATENT"
-    ],
-    [
-      26,
-      17,
-      0,
-      19,
-      0,
-      "FLOAT"
-    ],
-    [
       47,
       20,
       0,
@@ -2615,28 +2607,36 @@
       "INT"
     ],
     [
+      35,
+      35,
+      0,
+      26,
+      0,
+      "LATENT"
+    ],
+    [
+      26,
+      17,
+      0,
+      19,
+      0,
+      "FLOAT"
+    ],
+    [
+      17,
+      19,
+      1,
+      12,
+      2,
+      "INT"
+    ],
+    [
       36,
       23,
       0,
       26,
       1,
       "FLOAT"
-    ],
-    [
-      65,
-      41,
-      1,
-      43,
-      0,
-      "LATENT"
-    ],
-    [
-      66,
-      43,
-      0,
-      35,
-      0,
-      "LATENT"
     ]
   ],
   "groups": [
