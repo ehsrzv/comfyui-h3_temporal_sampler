@@ -1,5 +1,7 @@
 # H3 Temporal Sampler
 
+![H3 Temporal Sampler](assets/banner.jpg)
+
 ComfyUI custom nodes for long-form MiniMax H3 video generation. Tile a long
 H3 audio-video latent into overlapping segments, denoise them consistently,
 and cache latents between runs.
