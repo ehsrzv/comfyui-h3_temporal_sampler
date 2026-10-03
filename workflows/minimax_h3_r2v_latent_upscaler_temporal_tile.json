@@ -1,8 +1,8 @@
 {
   "id": "1e132da8-4308-4d7e-b766-009313e961c8",
   "revision": 0,
-  "last_node_id": 42,
-  "last_link_id": 64,
+  "last_node_id": 43,
+  "last_link_id": 66,
   "nodes": [
     {
       "id": 1,
@@ -342,7 +342,7 @@
         106
       ],
       "flags": {},
-      "order": 37,
+      "order": 38,
       "mode": 0,
       "inputs": [
         {
@@ -587,15 +587,15 @@
       "id": 10,
       "type": "LTXVConcatAVLatent",
       "pos": [
-        1970.9114206444888,
-        5102.2627638016265
+        1970.911420644489,
+        5182.856297650133
       ],
       "size": [
         286.8360679651149,
         46
       ],
       "flags": {},
-      "order": 32,
+      "order": 33,
       "mode": 0,
       "inputs": [
         {
@@ -920,7 +920,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 35,
+      "order": 36,
       "mode": 0,
       "inputs": [
         {
@@ -1259,7 +1259,7 @@
       "flags": {
         "collapsed": false
       },
-      "order": 34,
+      "order": 35,
       "mode": 0,
       "inputs": [
         {
@@ -1618,7 +1618,7 @@
         150
       ],
       "flags": {},
-      "order": 36,
+      "order": 37,
       "mode": 0,
       "inputs": [
         {
@@ -1669,22 +1669,22 @@
       "id": 35,
       "type": "LTXVSeparateAVLatent",
       "pos": [
-        1966.715273508606,
-        4699.039493830161
+        1968.3371783703205,
+        4813.654104057987
       ],
       "size": [
         286.836067965115,
         48.43467905382113
       ],
       "flags": {},
-      "order": 29,
+      "order": 31,
       "mode": 0,
       "inputs": [
         {
           "label": "av_latent",
           "name": "av_latent",
           "type": "LATENT",
-          "link": 64
+          "link": 66
         }
       ],
       "outputs": [
@@ -1824,15 +1824,15 @@
       "id": 26,
       "type": "MinimaxH3LatentUpscaler3D",
       "pos": [
-        1969.409199969843,
-        4827.265029425342
+        1966.5308594752535,
+        4902.821467408315
       ],
       "size": [
         286.836067965115,
         226
       ],
       "flags": {},
-      "order": 31,
+      "order": 32,
       "mode": 0,
       "inputs": [
         {
@@ -2071,7 +2071,7 @@
         246.4346039398115
       ],
       "flags": {},
-      "order": 33,
+      "order": 34,
       "mode": 0,
       "inputs": [
         {
@@ -2186,7 +2186,7 @@
           "links": [
             62,
             63,
-            64
+            65
           ]
         }
       ],
@@ -2206,6 +2206,50 @@
         "smart_bounds": true,
         "overlap_frames": 10,
         "blend_mode": "adaptive"
+      }
+    },
+    {
+      "id": 43,
+      "type": "H3LatentCache",
+      "pos": [
+        1964.6962509729674,
+        4666.157868954603
+      ],
+      "size": [
+        295.0591796875,
+        106
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "link": 65
+        }
+      ],
+      "outputs": [
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [
+            66
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "H3LatentCache"
+      },
+      "widgets_values": [
+        false,
+        "h3_stage2_latent",
+        "1SingPDMD.h3latent.pt"
+      ],
+      "widgets_values_named": {
+        "load_mode": false,
+        "filename_prefix": "h3_stage2_latent",
+        "latent_file": "1SingPDMD.h3latent.pt"
       }
     }
   ],
@@ -2491,14 +2535,6 @@
       "LATENT"
     ],
     [
-      64,
-      41,
-      1,
-      35,
-      0,
-      "LATENT"
-    ],
-    [
       3,
       34,
       0,
@@ -2585,6 +2621,22 @@
       26,
       1,
       "FLOAT"
+    ],
+    [
+      65,
+      41,
+      1,
+      43,
+      0,
+      "LATENT"
+    ],
+    [
+      66,
+      43,
+      0,
+      35,
+      0,
+      "LATENT"
     ]
   ],
   "groups": [
@@ -2679,8 +2731,8 @@
     "ds": {
       "scale": 0.6316771145038462,
       "offset": [
-        -51.24793069142767,
-        -3939.4202888221116
+        -484.9979368007167,
+        -4088.3522171909135
       ]
     },
     "frontendVersion": "1.53.6",
