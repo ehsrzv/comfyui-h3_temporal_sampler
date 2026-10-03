@@ -542,6 +542,12 @@ class H3TemporalSampler:
         mot = _motion_profile(video) if need_motion else None
 
         # 3. boundary positions: smart (motion valleys) or even
+        # VRAM budget cap: computed unconditionally so both the smart-bounds
+        # planner AND the last-segment backward extension respect it.
+        H, W = video.shape[3], video.shape[4]
+        seg_budget = 34 * 84 * 144  # his validated stage-2 reference
+        max_seg_len = max(2 * GRID,
+                          (seg_budget // max(1, H * W) // GRID) * GRID)
         bounds = None
         if bool(smart_bounds) and N > 1:
             # Cap segment length at the frame-pixel VRAM budget so the DP
@@ -549,10 +555,6 @@ class H3TemporalSampler:
             # The cap applies to the FINAL overlapping segments, not just
             # the bounds: middle segments grow by 2*ov when overlap is
             # added, so the bounds are planned against (max_seg_len - 2*ov).
-            H, W = video.shape[3], video.shape[4]
-            seg_budget = 34 * 84 * 144  # his validated stage-2 reference
-            max_seg_len = max(2 * GRID,
-                              (seg_budget // max(1, H * W) // GRID) * GRID)
             _ov_in = int(overlap_frames)
             _max_ov = max(GRID, (_ov_in // GRID) * GRID)
             _bounds_max = max(2 * GRID, max_seg_len - _max_ov)
@@ -584,9 +586,13 @@ class H3TemporalSampler:
             need = longest - (v1 - v0)
             if need > 0:
                 ext = ((need + GRID - 1) // GRID) * GRID
-                v0 = max(0, v0 - ext)
-                a0 = int(round(v0 * (Ta / Tv))) if Tv else a0
-                segments[-1] = (v0, v1, a0, a1)
+                # Never extend past the VRAM budget cap.
+                max_ext = max(0, max_seg_len - (v1 - v0))
+                ext = min(ext, (max_ext // GRID) * GRID)
+                if ext > 0:
+                    v0 = max(0, v0 - ext)
+                    a0 = int(round(v0 * (Ta / Tv))) if Tv else a0
+                    segments[-1] = (v0, v1, a0, a1)
 
         # Full noise field once; sliced per segment so the overlap region sees
         # identical initial noise in both neighbours.
