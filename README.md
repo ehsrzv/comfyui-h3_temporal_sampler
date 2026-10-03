@@ -1,6 +1,6 @@
 # H3 Temporal Sampler
 
-![H3 Temporal Sampler](assets/banner.jpg)
+![H3 Temporal Sampler](https://github.com/ehsrzv/comfyui-h3_temporal_tile/blob/main/assets/banner.jpg?raw=true)
 
 ComfyUI custom nodes for long-form MiniMax H3 video generation. Tile a long
 H3 audio-video latent into overlapping segments, denoise them consistently,
@@ -39,7 +39,7 @@ denoises each segment, and joins them seamlessly.
 
 **How it works**
 
-![How it works](assets/schematic.jpg)
+![How it works](https://github.com/ehsrzv/comfyui-h3_temporal_tile/blob/main/assets/schematic.jpg?raw=true)
 
 Each segment is sampled independently (one model init, shared across
 segments via equal-shape padding), then joined with the selected
