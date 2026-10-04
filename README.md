@@ -6,9 +6,9 @@ ComfyUI custom nodes for high-resolution MiniMax H3 video generation. Split
 an H3 audio-video latent that exceeds your VRAM into overlapping segments,
 denoise them consistently, and cache latents between runs.
 
-> This node is designed for pushing MiniMax H3 output size up to 2K and beyond
-> (it also extends video duration), working around VRAM limits at the cost of
-> longer render times. In practice, the author has used it to upscale up to 4K
+> This node is optimized for increasing output size (up to 2K and beyond), but
+> it can also be used for longer videos — working around VRAM limits at the cost
+> of longer render times. In practice, the author has used it to upscale up to 4K
 > — more would be possible, but MiniMax gains little from upscaling past that
 > point.
 
@@ -84,7 +84,7 @@ author's own system.
 
 https://github.com/user-attachments/assets/955a1ff6-3759-4d37-a455-b27ec17e182e
 
-Sample render — Stage 1 was short enough for a single pass, no Temporal Sampler needed. Stage 2 crashed on VRAM, so it was split into 4 segments (overlap 5, Seam Lock Frames 2) to get through. Fine textures stay perfectly stable across all 4 segments, with no visible seams. Seam-quality scores: 0.67 / 0.36 / 0.15 (lower = cleaner).
+Sample render — Stage 1 was short enough for a single pass, no Temporal Sampler needed. Stage 2 crashed on VRAM, so it was split into 4 segments (overlap 5, Seam Lock Frames 2) to get through. Segment cuts at approx. 2.1s, 4.9s and 7.7s of the 11.5s clip. Fine textures stay perfectly stable across all 4 segments, with no visible seams. Seam-quality scores: 0.67 / 0.36 / 0.15 (lower = cleaner).
 
 Texture check across the segment boundaries: facial skin tone and lighting stay continuous, the tie's dot pattern keeps its size, spacing and alignment, and the jacket's houndstooth weave shows no breaks — only natural singing motion.
 
