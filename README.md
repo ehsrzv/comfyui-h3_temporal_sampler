@@ -2,15 +2,15 @@
 
 ![H3 Temporal Sampler](https://github.com/ehsrzv/comfyui-h3_temporal_sampler/blob/main/assets/banner.jpg?raw=true)
 
-ComfyUI custom nodes for long-form MiniMax H3 video generation. Tile a long
-H3 audio-video latent into overlapping segments, denoise them consistently,
-and cache latents between runs.
+ComfyUI custom nodes for high-resolution MiniMax H3 video generation. Split
+an H3 audio-video latent that exceeds your VRAM into overlapping segments,
+denoise them consistently, and cache latents between runs.
 
-> This node is designed both for extending video duration and for increasing
-> size up to 2K and beyond, but it increases render cost and is primarily
-> designed for working around VRAM limits. In practice, the author has used
-> it to upscale up to 4K — more would be possible, but MiniMax gains little
-> from upscaling past that point.
+> This node is designed for pushing MiniMax H3 output size up to 2K and beyond
+> (it also extends video duration), working around VRAM limits at the cost of
+> longer render times. In practice, the author has used it to upscale up to 4K
+> — more would be possible, but MiniMax gains little from upscaling past that
+> point.
 
 ## Nodes
 
@@ -18,9 +18,9 @@ All nodes live under the **h3 temporal sampler** category.
 
 ### H3 Temporal Sampler
 
-Tiled `SamplerCustomAdvanced` for H3 AV latents. Splits a long latent into
-overlapping time segments (grid-snapped to multiples of 5 latent frames),
-denoises each segment, and joins them seamlessly.
+Segmented `SamplerCustomAdvanced` for H3 AV latents. Splits the latent into
+overlapping time segments (grid-snapped to multiples of 5 latent frames) so
+each fits in VRAM, denoises each segment, and joins them seamlessly.
 
 **Inputs**
 
@@ -30,9 +30,9 @@ denoises each segment, and joins them seamlessly.
 | noise | NOISE | — | Full-length noise field; sliced per segment so overlaps share identical initial noise. |
 | guider | GUIDER | — | Conditioning guider, applied identically to every segment. |
 | sampler | SAMPLER | — | Sampler algorithm used for every segment. |
-| sigmas | SIGMAS | — | Sigma schedule; identical for every segment so the tiles match. |
+| sigmas | SIGMAS | — | Sigma schedule; identical for every segment so the segments match. |
 | latent_image | LATENT | — | Full-length H3 AV latent (nested video + audio). |
-| num_segments | INT | 4 | 1–10. How many overlapping time segments to split into. |
+| num_segments | INT | 4 | 1–10. How many overlapping segments to split the latent into — more segments fit larger sizes in VRAM. |
 | smart_bounds | BOOLEAN | False | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
 | overlap_frames | INT | 5 | 5–20, snapped to multiples of 5. Overlap between neighbours. Larger = smoother joins, more compute. |
 | blend_mode | COMBO | multiband | Join style for the final assembly: `linear` / `adaptive` / `multiband` (fine detail blended narrowly — best for fine textures). |
@@ -76,9 +76,9 @@ is denoised on its own, raising `num_segments` lets you push the size higher
 than a single pass could handle — but each extra segment costs render time.
 
 There is no universal number: the right segment count depends on your GPU's
-VRAM and the clip duration, so tune it yourself until you get a feel for what
-your card handles. The current defaults are tuned for the author's own system.
-.
+VRAM, the target size and the clip duration, so tune it yourself until you get
+a feel for what your card handles. The current defaults are tuned for the
+author's own system.
 
 ## Demo
 
