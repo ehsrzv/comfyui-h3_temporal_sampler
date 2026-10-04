@@ -54,33 +54,30 @@ joins stay invisible. A per-boundary seam-quality report is printed (lower
 
 **Notes**
 
-- Segment length is capped at a frame-pixel VRAM budget (validated
-  reference: 34 frames at 84×144); with `smart_bounds` off, raise
-  `num_segments` if segments get too large for VRAM.
+- Each segment is capped by a VRAM budget (validated reference:
+  34 latent frames at 84×144); if segments get too large, raise
+  `num_segments`.
 - Overlap is reserved up front, so padded segments never exceed the cap.
 
 **Tuning segments for your hardware**
 
-`num_segments` is your main lever against VRAM exhaustion: more segments mean
-shorter segments, and shorter segments use less VRAM. If a render runs out of
-memory, raise `num_segments`; if every segment is comfortably small, lower it
-for a faster render.
+`num_segments` is your main lever: more segments mean shorter segments, and
+shorter segments use less VRAM — which is also how you push output size higher
+than a single pass could handle. If a render runs out of memory, raise
+`num_segments`; if every segment is comfortably small, lower it for a faster
+render.
 
 The trade-off is time: each extra segment adds its own denoising pass (plus
-overlap work), so total render time grows as the segment count grows. As a rule
-of thumb, use the fewest segments that still keep every segment under the VRAM
-cap — that is the shortest render your GPU can handle.
+overlap work), so total render time grows with the segment count. As a rule of
+thumb, use the fewest segments that still fit — that is the shortest render
+your GPU can handle.
 
-More segments also buy headroom for larger output sizes: because each segment
-is denoised on its own, raising `num_segments` lets you push the size higher
-than a single pass could handle — but each extra segment costs render time.
+There is no universal number: the right count depends on your GPU's VRAM, the
+target size and the clip duration, so tune it yourself until you get a feel
+for what your card handles. The current defaults are tuned for the author's
+own system.
 
-There is no universal number: the right segment count depends on your GPU's
-VRAM, the target size and the clip duration, so tune it yourself until you get
-a feel for what your card handles. The current defaults are tuned for the
-author's own system.
-
-## Demo
+### Demo
 
 https://github.com/user-attachments/assets/955a1ff6-3759-4d37-a455-b27ec17e182e
 
