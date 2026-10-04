@@ -461,9 +461,9 @@ class H3TemporalSampler:
                                              "tooltip": "ON: place segment boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible."}),
                 "overlap_frames": ("INT", {"default": 10, "min": 5, "max": 20, "step": GRID,
                                            "tooltip": "Overlap between neighbours, snapped to multiples of 5 latent frames. Larger = smoother joins, more compute."}),
-                "blend_mode": (["linear", "smoothstep", "adaptive"],
+                "blend_mode": (["linear", "smoothstep", "adaptive", "multiband"],
                                {"default": "adaptive",
-                                "tooltip": "Join style for the final assembly: linear (straight ramp) / smoothstep (softer ends) / adaptive (rushes through disagreeing frames)."}),
+                                "tooltip": "Join style for the final assembly: linear (straight ramp) / smoothstep (softer ends) / adaptive (rushes through disagreeing frames) / multiband (fine detail blended narrowly, best for fine textures)."}),
             }
         }
 
