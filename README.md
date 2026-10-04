@@ -2,7 +2,7 @@
 
 ![H3 Temporal Sampler](https://github.com/ehsrzv/comfyui-h3_temporal_sampler/blob/main/assets/banner.jpg?raw=true)
 
-ComfyUI custom nodes for high-resolution MiniMax H3 video generation. Split
+ComfyUI custom nodes for seamless high-resolution MiniMax H3 video generation. Split
 an H3 audio-video latent that exceeds your VRAM into overlapping segments,
 denoise them consistently, and cache latents between runs.
 
