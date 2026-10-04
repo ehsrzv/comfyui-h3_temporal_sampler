@@ -82,7 +82,7 @@ your card handles. The current defaults are tuned for the author's own system.
 
 ## Demo
 
-[![Watch the demo](https://raw.githubusercontent.com/ehsrzv/comfyui-h3_temporal_sampler/main/assets/demo-poster.jpg)](https://github.com/ehsrzv/comfyui-h3_temporal_sampler/blob/main/assets/demo.mp4)
+https://github.com/user-attachments/assets/4a959816-0bad-4828-a5cd-d1c83588301b
 
 Sample render — Stage 1 (0.6 MP) was short enough for a single pass, no Temporal Sampler needed. Stage 2 (2 MP) crashed on VRAM, so it was split into 4 segments (overlap 5, Seam Lock Frames 2) to get through. Fine textures stay perfectly stable across all 4 segments, with no visible seams. Seam-quality scores: 0.67 / 0.36 / 0.15 (lower = cleaner).
 
