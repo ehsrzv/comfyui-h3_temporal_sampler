@@ -110,7 +110,7 @@ Then restart ComfyUI.
 
 ### Option 3: ComfyUI Manager
 
-Search for `comfyui-h3_temporal_tile` in ComfyUI Manager and install.
+Search for `h3-temporal-tile` in ComfyUI Manager and install.
 
 ---
 
