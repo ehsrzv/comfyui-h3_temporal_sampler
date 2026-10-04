@@ -132,4 +132,4 @@ Example workflow based on the workflow templates from
 
 ## License
 
-MIT
+Apache 2.0
