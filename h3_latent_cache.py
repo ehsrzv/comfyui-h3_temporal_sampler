@@ -70,7 +70,7 @@ class H3LatentCache:
     RETURN_NAMES = ("latent",)
     FUNCTION = "run"
     OUTPUT_NODE = True
-    CATEGORY = "h3 temporal tile"
+    CATEGORY = "h3 temporal sampler"
 
     def run(self, latent, load_mode, filename_prefix, latent_file):
         out_dir = _latent_dir()

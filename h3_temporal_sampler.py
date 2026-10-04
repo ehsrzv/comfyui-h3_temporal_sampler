@@ -4,10 +4,6 @@ import torch
 GRID = 5  # latent frames per keyframe-token block (~= 17 pixel frames)
 
 
-def _snap_down(v):
-    return (int(v) // GRID) * GRID
-
-
 def _unbind_av(samples):
     # comfy's NestedTensor.unbind() takes no dim argument.
     try:
@@ -56,6 +52,41 @@ def _slice_mask(mask, v0, v1, a0, a1, Tv, si=0):
         return None
 
 
+def _seam_lock_mask(seg_mask, seg_v, seg_a, template, n=1):
+    """Pin the first n video frames via the denoise mask (seam lock).
+
+    The lock frames were written into seg_samples' frames 0..n-1; the
+    mask freezes frame 0 fully (0) and ramps toward free (i/n) so the
+    lock releases gradually instead of ending in a hard step. n=1
+    reproduces the original hard single-frame lock. Mask 1 = denoise,
+    0 = keep latent. Returns a NestedTensor mask in the same layout
+    _slice_mask produces. An existing seg_mask is multiplied in. On any
+    shape mismatch the original seg_mask is returned (lock degrades to
+    an unpinned warm start, never a crash).
+    """
+    try:
+        n = max(1, min(int(n), seg_v.shape[2]))
+        pin_v = torch.ones(seg_v.shape, device=seg_v.device,
+                           dtype=torch.float32)
+        ramp = torch.arange(n, device=seg_v.device,
+                            dtype=torch.float32) / float(n)
+        pin_v[:, :, 0:n] = ramp.view(1, 1, n, 1, 1)
+        pin_a = torch.ones(seg_a.shape, device=seg_a.device,
+                           dtype=torch.float32)
+        if seg_mask is None:
+            m_v, m_a = pin_v, pin_a
+        elif isinstance(seg_mask, torch.Tensor):
+            m_v = (seg_mask.to(dtype=torch.float32) * pin_v).contiguous()
+            m_a = pin_a
+        else:
+            em_v, em_a = _unbind_av(seg_mask)
+            m_v = (em_v.to(dtype=torch.float32) * pin_v).contiguous()
+            m_a = (em_a.to(dtype=torch.float32) * pin_a).contiguous()
+        return _pack_av(m_v, m_a, template=template)
+    except Exception:
+        return seg_mask
+
+
 def _inner_bounds(Tv, num_segments):
     """Inner segment boundary positions (GRID-snapped), plus segment count."""
     N = max(1, min(int(num_segments), max(1, Tv // GRID)))
@@ -101,8 +132,7 @@ def _blend_weight(ov, mode, device, dtype, a_tail=None, b_head=None, sharpness=6
     """Per-frame blend weights s in [0,1] across an overlap of ov frames.
 
     linear     : straight ramp (validated default)
-    smoothstep : 3t^2 - 2t^3, softer ends, faster middle -> less ghosting
-    cosine     : 0.5 - 0.5*cos(pi*t), close cousin of smoothstep
+    cosine     : 0.5 - 0.5*cos(pi*t), eased ramp, softer ends
     gaussian   : each side weighted by a Gaussian centered on itself
                  (Mixture-of-Diffusers style), renormalized to exact 0->1
     sigmoid    : logistic S-curve, steepness set by `sharpness`
@@ -118,9 +148,7 @@ def _blend_weight(ov, mode, device, dtype, a_tail=None, b_head=None, sharpness=6
     t = torch.linspace(0, 1, ov, device=device, dtype=dtype)
     if ov < 2:
         return t
-    if mode == "smoothstep":
-        s = t * t * (3 - 2 * t)
-    elif mode == "cosine":
+    if mode == "cosine":
         s = 0.5 - 0.5 * torch.cos(t * torch.pi)
     elif mode == "gaussian":
         sig = 0.45
@@ -186,17 +214,6 @@ def _blend_multiband(a_tail, b_head, narrow_frac=0.5):
             + (1 - w_high) * high_a + w_high * high_b)
 
 
-def _motion_to_overlap(score):
-    """Map a normalized motion score to a GRID-snapped overlap (v1 heuristics).
-
-    Auto mode never exceeds 10 (2*GRID): bigger overlaps cost more compute
-    than they buy (lowered from 15 on 2026-10-03: heavy).
-    """
-    if score < 0.10:
-        return GRID
-    return 2 * GRID
-
-
 def _motion_profile(video):
     """Normalized per-frame motion of the input latent: (Tv-1,) tensor."""
     with torch.no_grad():
@@ -206,29 +223,16 @@ def _motion_profile(video):
         return mot / scale
 
 
-def _auto_num_segments(Tv, video):
-    """Pick segment count so each segment is ~34 latent frames at 84x144.
-
-    Memory scales with frames x pixels; the reference is his validated
-    stage-2 run (172 frames at 84x144 latent in 5 segments). v1 heuristic,
-    printed every run.
-    """
-    H, W = video.shape[3], video.shape[4]
-    budget = 34 * 84 * 144  # frame-pixels per segment
-    target = max(10, int(budget / max(1, H * W)))
-    N = max(1, min(10, (Tv + target - 1) // target))
-    return min(N, max(1, Tv // GRID))
-
-
 def _smart_bounds(Tv, motion, N, window=10, max_len=None):
     """Place N-1 inner boundaries at motion valleys (GRID-snapped).
 
     motion: normalized (Tv-1,) profile. The cost of a candidate is the MEAN
     motion in a small window around it (a narrow calm moment counts; nearby
-    spikes push the boundary away). Boundaries keep a minimum gap so no
-    segment gets degenerate, and no segment may exceed max_len (the
-    frame-pixel VRAM budget — without this the DP happily clusters all
-    boundaries in one calm region and leaves a giant VRAM-busting segment).
+    spikes push the boundary away). Every core segment (boundary to
+    boundary) is at least min_len long, so no segment gets degenerate, and
+    no segment may exceed max_len (the frame-pixel VRAM budget — without
+    this the DP happily clusters all boundaries in one calm region and
+    leaves a giant VRAM-busting segment).
     Returns [0, ..., Tv], or None if infeasible (caller falls back to even
     spacing).
     """
@@ -237,14 +241,18 @@ def _smart_bounds(Tv, motion, N, window=10, max_len=None):
     if max_len is None:
         max_len = Tv
     max_len = max(GRID, int(max_len))
-    min_gap = max(GRID, GRID * ((Tv // N) // 2 // GRID))
-    if (N + 1) * min_gap > Tv:
+    # Minimum core segment length: half the even share, at least 2*GRID.
+    # This is what actually prevents degenerate edge segments (a boundary
+    # at GRID would leave a GRID-long first segment) and boundary
+    # clustering inside one calm region.
+    min_len = max(2 * GRID, (Tv // N) // 2)
+    if N * min_len > Tv:
         return None
     if N * max_len < Tv:
         # Even the tightest packing can't cover the video: infeasible.
         return None
     cands = [p for p in range(GRID, Tv, GRID)
-             if p >= min_gap and Tv - p >= min_gap]
+             if p >= min_len and Tv - p >= min_len]
     if len(cands) < N - 1:
         return None
 
@@ -268,7 +276,7 @@ def _smart_bounds(Tv, motion, N, window=10, max_len=None):
             best, bi = INF, -1
             for k in range(i):
                 gap = cands[i] - cands[k]
-                if gap >= min_gap and gap <= max_len and dp[j - 1][k] < best:
+                if gap >= min_len and gap <= max_len and dp[j - 1][k] < best:
                     best, bi = dp[j - 1][k], k
             if bi >= 0:
                 dp[j][i] = best + costs[i]
@@ -287,29 +295,6 @@ def _smart_bounds(Tv, motion, N, window=10, max_len=None):
         j -= 1
     chosen.reverse()
     return [0] + chosen + [Tv]
-
-
-def _auto_overlaps(mot, Tv, inner_bounds, num_segments, window=15):
-    """Per-boundary overlap from LOCAL motion (mot: normalized (Tv-1,) profile).
-
-    A boundary sitting in a calm region gets a small overlap (less compute);
-    one in a fast region gets a bigger overlap (safer join, max 10). Each
-    overlap is capped so the total redundant work stays under ~40%.
-    Returns (overlaps, scores) for the inner boundaries.
-    """
-    N = int(num_segments)
-    cap = GRID * max(1, int(0.4 * Tv / max(1, N - 1) / GRID)) if N > 1 else GRID
-    ovs, scores = [], []
-    for p in inner_bounds:
-        lo = max(0, p - window)
-        hi = min(Tv - 1, p + window)
-        if hi > lo:
-            local = float(mot[lo:hi].median().item())
-        else:
-            local = float(mot.median().item())
-        ovs.append(min(_motion_to_overlap(local), cap))
-        scores.append(local)
-    return ovs, scores
 
 
 def _apply_blend(a_tail, b_head, mode, sharpness=6.0):
@@ -357,25 +342,6 @@ def _score_blend(b, a_tail, b_head):
     return score
 
 
-_AUTO_CANDIDATES = ["linear", "smoothstep", "midpoint", "adaptive", "multiband"]
-
-
-def _blend_auto(a_tail, b_head, sharpness=6.0, tag=""):
-    """Try each candidate blend, measure, keep the best. Returns (blend, name)."""
-    best_name, best_blend, best_score = None, None, float("inf")
-    scores = {}
-    for name in _AUTO_CANDIDATES:
-        b = _apply_blend(a_tail, b_head, name, sharpness)
-        s = _score_blend(b, a_tail, b_head)
-        scores[name] = s
-        if s < best_score:
-            best_score, best_name, best_blend = s, name, b
-    if tag:
-        sstr = ", ".join(f"{k}={v:.3f}" for k, v in scores.items())
-        print(f"[H3TemporalSampler] auto-blend {tag}: -> {best_name} ({sstr})")
-    return best_blend, best_name
-
-
 def _merge_next(acc, nv, na, nv0, nv1, na0, na1, crossfade,
                 blend_mode="linear", blend_sharpness=6.0, tag="", seam_log=None):
     """Incrementally merge one segment into the accumulator.
@@ -383,7 +349,7 @@ def _merge_next(acc, nv, na, nv0, nv1, na0, na1, crossfade,
     acc is None or (mv, ma, pv1, pa1) where the accumulated result covers
     [0, pv1) video frames / [0, pa1) audio tokens. The new segment covers
     [nv0, nv1) / [na0, na1). Returns (mv, ma, nv1, na1, used_mode) where
-    used_mode is the blend actually applied ('auto' resolves per boundary).
+    used_mode is the blend actually applied.
     When seam_log (a list) is given, (tag, used_mode, overlap, score) is
     appended for the quality report; lower score = cleaner join.
     """
@@ -395,12 +361,7 @@ def _merge_next(acc, nv, na, nv0, nv1, na0, na1, crossfade,
     used = blend_mode
     if crossfade and ov > 0:
         a_tail, b_head = mv[:, :, pv1 - ov:pv1], nv[:, :, :ov]
-        if blend_mode == "auto":
-            # Try candidate blends, measure, keep the best for this boundary.
-            blend_v, used = _blend_auto(a_tail, b_head,
-                                        sharpness=blend_sharpness, tag=tag)
-        else:
-            blend_v = _apply_blend(a_tail, b_head, blend_mode, blend_sharpness)
+        blend_v = _apply_blend(a_tail, b_head, blend_mode, blend_sharpness)
         if seam_log is not None:
             try:
                 s = _score_blend(blend_v, a_tail, b_head)
@@ -437,7 +398,7 @@ class H3TemporalSampler:
     after every step the overlap regions are averaged (cosine-ramped) and
     written back to both sides. Final assembly is a gentle linear join
     (the tiles already agree).
-    smart_bounds=True places boundaries at motion valleys instead of even
+    "Smart Bounds"=True places boundaries at motion valleys instead of even
     spacing (segments capped at the frame-pixel VRAM budget, so no giant
     tiles). A seam-quality score per boundary is printed at the end
     (lower is better; CHECK flags suspicious joins).
@@ -448,34 +409,45 @@ class H3TemporalSampler:
     def INPUT_TYPES(cls):
         return {
             "required": {
-                "enable": ("BOOLEAN", {"default": True,
+                "Enable": ("BOOLEAN", {"default": True,
                                              "tooltip": "ON: tiled sampling with overlap blending. OFF: one plain pass over the full latent, like SamplerCustomAdvanced."}),
                 "noise": ("NOISE", {"tooltip": "Full-length noise field; sliced per segment so overlaps share identical initial noise."}),
                 "guider": ("GUIDER", {"tooltip": "Conditioning guider (prompt + reference). Applied identically to every segment."}),
                 "sampler": ("SAMPLER", {"tooltip": "Sampler algorithm used for every segment."}),
                 "sigmas": ("SIGMAS", {"tooltip": "Sigma schedule; identical for every segment so the tiles match."}),
                 "latent_image": ("LATENT", {"tooltip": "Full-length H3 AV latent to denoise in tiled segments."}),
-                "num_segments": ("INT", {"default": 4, "min": 1, "max": 10,
+                "Num Segments": ("INT", {"default": 4, "min": 1, "max": 10,
                                          "tooltip": "How many overlapping time segments the latent is split into."}),
-                "smart_bounds": ("BOOLEAN", {"default": True,
+                "Smart Bounds": ("BOOLEAN", {"default": False,
                                              "tooltip": "ON: place segment boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible."}),
-                "overlap_frames": ("INT", {"default": 10, "min": 5, "max": 20, "step": GRID,
+                "Overlap Frames": ("INT", {"default": 5, "min": 5, "max": 20, "step": GRID,
                                            "tooltip": "Overlap between neighbours, snapped to multiples of 5 latent frames. Larger = smoother joins, more compute."}),
-                "blend_mode": (["linear", "smoothstep", "adaptive", "multiband"],
-                               {"default": "adaptive",
-                                "tooltip": "Join style for the final assembly: linear (straight ramp) / smoothstep (softer ends) / adaptive (rushes through disagreeing frames) / multiband (fine detail blended narrowly, best for fine textures)."}),
+                "Blend Mode": (["linear", "adaptive", "multiband"],
+                               {"default": "multiband",
+                                "tooltip": "Join style for the final assembly: linear (straight ramp) / adaptive (rushes through disagreeing frames) / multiband (fine detail blended narrowly, best for fine textures)."}),
+                "Seam Lock": ("BOOLEAN", {"default": True,
+                                             "tooltip": "ON: pin each segment's leading frame(s) to the merged timeline (seam lock via denoise mask). OFF: pure crossfade blending."}),
+                "Seam Lock Frames": ("INT", {"default": 2, "min": 1, "max": 4, "step": 1,
+                                             "tooltip": "How many leading frames of each segment are pinned (1 = hard single-frame lock; 2-4 = tapered lock releasing gradually). Clamped to the overlap."}),
             }
         }
 
     RETURN_TYPES = ("LATENT", "LATENT")
     RETURN_NAMES = ("output", "denoised_output")
     FUNCTION = "sample"
-    CATEGORY = "h3 temporal tile"
+    CATEGORY = "h3 temporal sampler"
 
     def sample(self, noise, guider, sampler, sigmas, latent_image,
-               num_segments=4, overlap_frames=10,
-               blend_mode="adaptive", enable=True,
-               smart_bounds=True):
+               **kwargs):
+        enable = bool(kwargs.get("Enable", True))
+        num_segments = int(kwargs.get("Num Segments", 4))
+        smart_bounds = bool(kwargs.get("Smart Bounds", False))
+        overlap_frames = int(kwargs.get("Overlap Frames", 5))
+        blend_mode = str(kwargs.get("Blend Mode", "multiband"))
+        seam_lock = bool(kwargs.get("Seam Lock", True))
+        lock_frames = max(1, min(4, int(kwargs.get("Seam Lock Frames", 2))))
+        if blend_mode not in ("linear", "adaptive", "multiband"):
+            blend_mode = "multiband"
         import comfy.sample
         import comfy.utils
         import comfy.nested_tensor
@@ -501,6 +473,7 @@ class H3TemporalSampler:
             # one guider.sample() call on the full latent, no tiling.
             mask = latent.get("noise_mask", None)
             full_noise = noise.generate_noise(latent)
+
             x0_output = {}
             callback = latent_preview.prepare_callback(
                 guider.model_patcher, sigmas.shape[-1] - 1, x0_output)
@@ -617,9 +590,12 @@ class H3TemporalSampler:
         crossfade = True
         blend_sharpness = 6.0
         seg_desc = ", ".join(f"[{v0},{v1})" for v0, v1, _, _ in segments)
+        _lock_tag = (f"ON ({int(lock_frames)}f)"
+                     if seam_lock and len(segments) > 1 else "OFF")
         print(f"[H3TemporalSampler] {len(segments)} segments ({seg_desc}), "
               f"padded to {Lmax}f/{Amax}a (one model init), "
-              f"overlap {overlap}f, {blend_mode if crossfade else 'hard cut'}")
+              f"overlap {overlap}f, {blend_mode if crossfade else 'hard cut'}, "
+              f"seam lock {_lock_tag}")
 
         def _pad_edge(t, pad, dim):
             if pad <= 0:
@@ -634,6 +610,22 @@ class H3TemporalSampler:
             pv, pa = Lmax - lv, Amax - la
             seg_v = _pad_edge(video[:, :, v0:v1].contiguous(), pv, 2)
             seg_a = _pad_edge(audio[..., a0:a1].contiguous(), pa, -1)
+            _lock_n = 0
+            if seam_lock and si > 0 and acc is not None:
+                # Seam lock: the first _lock_n frames of this segment are
+                # pinned to the merged timeline's frames at v0..v0+_lock_n.
+                # acc already covers [0, pv1) with pv1 > v0 (overlap > 0),
+                # so the lock frames are always the actual final content at
+                # those timeline positions -- this also stays valid when the
+                # last segment was extended backward past the previous
+                # segment's start. Clamped to the real overlap.
+                _mv_acc, _, _pv1_acc, _ = acc
+                _lock_n = max(0, min(int(lock_frames), _pv1_acc - v0,
+                                     seg_v.shape[2]))
+                if _lock_n > 0:
+                    _lock = _mv_acc[:, :, v0:v0 + _lock_n]
+                    seg_v[:, :, 0:_lock_n] = _lock.to(device=seg_v.device,
+                                                      dtype=seg_v.dtype)
             seg_samples = _pack_av(seg_v, seg_a, template=samples)
             seg_noise = _pack_av(_pad_edge(n_video[:, :, v0:v1].contiguous(), pv, 2),
                                  _pad_edge(n_audio[..., a0:a1].contiguous(), pa, -1),
@@ -649,6 +641,11 @@ class H3TemporalSampler:
                                                    _pad_edge(ma_m, pa, -1)])
                     except Exception:
                         seg_mask = None
+            if _lock_n > 0:
+                # Tapered freeze, applied for real: the lock frames stay
+                # pinned to the merged-timeline content through every step.
+                seg_mask = _seam_lock_mask(seg_mask, seg_v, seg_a, samples,
+                                           n=_lock_n)
 
             x0_output = {}
             callback = latent_preview.prepare_callback(

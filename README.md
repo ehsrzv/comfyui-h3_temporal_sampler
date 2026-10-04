@@ -1,6 +1,6 @@
 # H3 Temporal Sampler
 
-![H3 Temporal Sampler](https://github.com/ehsrzv/comfyui-h3_temporal_tile/blob/main/assets/banner.jpg?raw=true)
+![H3 Temporal Sampler](https://github.com/ehsrzv/comfyui-h3_temporal_sampler/blob/main/assets/banner.jpg?raw=true)
 
 ComfyUI custom nodes for long-form MiniMax H3 video generation. Tile a long
 H3 audio-video latent into overlapping segments, denoise them consistently,
@@ -14,7 +14,7 @@ and cache latents between runs.
 
 ## Nodes
 
-All nodes live under the **h3 temporal tile** category.
+All nodes live under the **h3 temporal sampler** category.
 
 ### H3 Temporal Sampler
 
@@ -41,7 +41,7 @@ denoises each segment, and joins them seamlessly.
 
 **How it works**
 
-![How it works](https://github.com/ehsrzv/comfyui-h3_temporal_tile/blob/main/assets/schematic.jpg?raw=true)
+![How it works](https://github.com/ehsrzv/comfyui-h3_temporal_sampler/blob/main/assets/schematic.jpg?raw=true)
 
 Each segment is sampled independently (one model init, shared across
 segments via equal-shape padding), then joined with the selected
@@ -94,7 +94,7 @@ refresh the dropdown list.
 
 ```bash
 cd ComfyUI/custom_nodes
-git clone https://github.com/ehsrzv/comfyui-h3_temporal_tile.git
+git clone https://github.com/ehsrzv/comfyui-h3_temporal_sampler.git
 ```
 
 Then restart ComfyUI.
@@ -102,19 +102,19 @@ Then restart ComfyUI.
 ### Option 2: Download zip
 
 1. Download the zip from the
-   [releases page](https://github.com/ehsrzv/comfyui-h3_temporal_tile/releases)
+   [releases page](https://github.com/ehsrzv/comfyui-h3_temporal_sampler/releases)
    (or the latest zip).
 2. Extract it into `ComfyUI/custom_nodes/` so you get:
-   `ComfyUI/custom_nodes/comfyui-h3_temporal_tile/`
+   `ComfyUI/custom_nodes/comfyui-h3_temporal_sampler/`
 3. Restart ComfyUI.
 
 ### Option 3: ComfyUI Manager
 
-Search for `h3-temporal-tile` in ComfyUI Manager and install.
+Search for `h3-temporal-sampler` in ComfyUI Manager and install.
 
 ---
 
-After installation, find the nodes under the **h3 temporal tile** category.
+After installation, find the nodes under the **h3 temporal sampler** category.
 No extra dependencies — only ComfyUI itself and a MiniMax H3 setup.
 
 ## Requirements

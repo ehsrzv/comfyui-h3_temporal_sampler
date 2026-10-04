@@ -20,33 +20,39 @@ function wire(node) {
 	if (!node || node.comfyClass !== "H3TemporalSampler") return;
 	const W = {};
 	for (const w of (node.widgets || [])) W[w.name] = w;
-	const names = ["enable", "num_segments", "smart_bounds",
-	               "overlap_frames", "blend_mode"];
+	const names = ["Enable", "Num Segments", "Smart Bounds",
+	               "Overlap Frames", "Blend Mode", "Seam Lock",
+	               "Seam Lock Frames"];
 	if (!names.every((n) => W[n])) return;
 
 	const sync = () => {
-		const tilingOff = !W["enable"].value;
-		setDisabled(W["num_segments"], tilingOff);
-		setDisabled(W["smart_bounds"], tilingOff);
-		setDisabled(W["overlap_frames"], tilingOff);
-		setDisabled(W["blend_mode"], tilingOff);
+		const tilingOff = !W["Enable"].value;
+		setDisabled(W["Num Segments"], tilingOff);
+		setDisabled(W["Smart Bounds"], tilingOff);
+		setDisabled(W["Overlap Frames"], tilingOff);
+		setDisabled(W["Blend Mode"], tilingOff);
+		setDisabled(W["Seam Lock"], tilingOff);
+		setDisabled(W["Seam Lock Frames"], tilingOff || !W["Seam Lock"].value);
 		try { node.setDirtyCanvas(true, true); } catch (_) {}
 	};
 
-	const w = W["enable"];
-	if (!w._h3t_wired) {
-		w._h3t_wired = true;
-		const orig = w.callback;
-		w.callback = function (...args) {
-			if (orig) orig.apply(this, args);
-			sync();
-		};
+	const w = W["Enable"];
+	const wl = W["Seam Lock"];
+	for (const ww of [w, wl]) {
+		if (!ww._h3t_wired) {
+			ww._h3t_wired = true;
+			const orig = ww.callback;
+			ww.callback = function (...args) {
+				if (orig) orig.apply(this, args);
+				sync();
+			};
+		}
 	}
 	sync();
 }
 
 app.registerExtension({
-	name: "h3_temporal_tile.widgets",
+	name: "h3_temporal_sampler.widgets",
 	nodeCreated(node) { wire(node); },
 	loadedGraphNode(node) { wire(node); },
 });
