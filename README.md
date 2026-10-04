@@ -77,8 +77,8 @@ than a single pass could handle — but each extra segment costs render time.
 
 There is no universal number: the right segment count depends on your GPU's
 VRAM and the clip duration, so tune it yourself until you get a feel for what
-your card handles. The current defaults are tuned for the author's own system
-(RTX 3090 Ti).
+your card handles. The current defaults are tuned for the author's own system.
+.
 
 ### H3 Latent Cache (Save/Load)
 
