@@ -33,9 +33,11 @@ denoises each segment, and joins them seamlessly.
 | sigmas | SIGMAS | — | Sigma schedule; identical for every segment so the tiles match. |
 | latent_image | LATENT | — | Full-length H3 AV latent (nested video + audio). |
 | num_segments | INT | 4 | 1–10. How many overlapping time segments to split into. |
-| smart_bounds | BOOLEAN | True | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
-| overlap_frames | INT | 10 | 5–20, snapped to multiples of 5. Overlap between neighbours. Larger = smoother joins, more compute. |
-| blend_mode | COMBO | adaptive | Join style for the final assembly: `linear` / `smoothstep` / `adaptive` / `multiband` (fine detail blended narrowly — best for fine textures). |
+| smart_bounds | BOOLEAN | False | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
+| overlap_frames | INT | 5 | 5–20, snapped to multiples of 5. Overlap between neighbours. Larger = smoother joins, more compute. |
+| blend_mode | COMBO | multiband | Join style for the final assembly: `linear` / `adaptive` / `multiband` (fine detail blended narrowly — best for fine textures). |
+| seam_lock | BOOLEAN | True | ON = freeze the leading frames of each segment (after the first) from the merged timeline via the denoise mask, so joins stay invisible. |
+| seam_lock_frames | INT | 2 | 1–4. How many leading frames to freeze; the freeze tapers off gradually (masks 0.0, 0.25, 0.5, 0.75). |
 
 **Outputs:** `output` (LATENT), `denoised_output` (LATENT)
 
@@ -45,8 +47,10 @@ denoises each segment, and joins them seamlessly.
 
 Each segment is sampled independently (one model init, shared across
 segments via equal-shape padding), then joined with the selected
-`blend_mode`. A per-boundary seam-quality report is printed (lower =
-cleaner; `CHECK` flags scores ≥ 1.0).
+`blend_mode`. With Seam Lock on, the leading frames of each segment are
+frozen from the merged timeline via the denoise mask before sampling, so
+joins stay invisible. A per-boundary seam-quality report is printed (lower
+= cleaner; `CHECK` flags scores ≥ 1.0).
 
 **Notes**
 
