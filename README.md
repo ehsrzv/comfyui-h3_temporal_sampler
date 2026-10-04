@@ -82,9 +82,9 @@ your card handles. The current defaults are tuned for the author's own system.
 
 ## Demo
 
-https://github.com/user-attachments/assets/4a959816-0bad-4828-a5cd-d1c83588301b
+https://github.com/user-attachments/assets/955a1ff6-3759-4d37-a455-b27ec17e182e
 
-Sample render — Stage 1 (0.6 MP) was short enough for a single pass, no Temporal Sampler needed. Stage 2 (2 MP) crashed on VRAM, so it was split into 4 segments (overlap 5, Seam Lock Frames 2) to get through. Fine textures stay perfectly stable across all 4 segments, with no visible seams. Seam-quality scores: 0.67 / 0.36 / 0.15 (lower = cleaner).
+Sample render — Stage 1 was short enough for a single pass, no Temporal Sampler needed. Stage 2 crashed on VRAM, so it was split into 4 segments (overlap 5, Seam Lock Frames 2) to get through. Fine textures stay perfectly stable across all 4 segments, with no visible seams. Seam-quality scores: 0.67 / 0.36 / 0.15 (lower = cleaner).
 
 Texture check across the segment boundaries: facial skin tone and lighting stay continuous, the tie's dot pattern keeps its size, spacing and alignment, and the jacket's houndstooth weave shows no breaks — only natural singing motion.
 
