@@ -71,6 +71,15 @@ overlap work), so total render time grows as the segment count grows. As a rule
 of thumb, use the fewest segments that still keep every segment under the VRAM
 cap — that is the shortest render your GPU can handle.
 
+More segments also buy headroom for larger output sizes: because each segment
+is denoised on its own, raising `num_segments` lets you push the size higher
+than a single pass could handle — but each extra segment costs render time.
+
+There is no universal number: the right segment count depends on your GPU's
+VRAM and the clip duration, so tune it yourself until you get a feel for what
+your card handles. The current defaults are tuned for the author's own system
+(RTX 3090 Ti).
+
 ### H3 Latent Cache (Save/Load)
 
 Save and load H3 nested latents. ComfyUI's core Save/Load Latent nodes
