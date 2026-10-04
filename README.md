@@ -35,7 +35,7 @@ denoises each segment, and joins them seamlessly.
 | num_segments | INT | 4 | 1–10. How many overlapping time segments to split into. |
 | smart_bounds | BOOLEAN | True | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
 | overlap_frames | INT | 10 | 5–20, snapped to multiples of 5. Overlap between neighbours. Larger = smoother joins, more compute. |
-| blend_mode | COMBO | adaptive | Join style for the final assembly: `linear` / `smoothstep` / `adaptive`. |
+| blend_mode | COMBO | adaptive | Join style for the final assembly: `linear` / `smoothstep` / `adaptive` / `multiband` (fine detail blended narrowly — best for fine textures). |
 
 **Outputs:** `output` (LATENT), `denoised_output` (LATENT)
 
