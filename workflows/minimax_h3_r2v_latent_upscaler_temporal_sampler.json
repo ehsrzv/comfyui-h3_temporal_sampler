@@ -1,8 +1,8 @@
 {
   "id": "1e132da8-4308-4d7e-b766-009313e961c8",
   "revision": 0,
-  "last_node_id": 43,
-  "last_link_id": 66,
+  "last_node_id": 46,
+  "last_link_id": 81,
   "nodes": [
     {
       "id": 1,
@@ -16,7 +16,7 @@
         334
       ],
       "flags": {},
-      "order": 30,
+      "order": 31,
       "mode": 4,
       "inputs": [
         {
@@ -453,13 +453,13 @@
       "flags": {
         "collapsed": false
       },
-      "order": 27,
+      "order": 28,
       "mode": 0,
       "inputs": [
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 62
+          "link": 80
         },
         {
           "name": "vae",
@@ -501,13 +501,13 @@
       "flags": {
         "collapsed": false
       },
-      "order": 28,
+      "order": 29,
       "mode": 0,
       "inputs": [
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 63
+          "link": 81
         },
         {
           "name": "vae",
@@ -617,7 +617,7 @@
           "name": "latent",
           "type": "LATENT",
           "links": [
-            54
+            69
           ]
         }
       ],
@@ -743,7 +743,7 @@
           "name": "LATENT",
           "type": "LATENT",
           "links": [
-            61
+            77
           ]
         }
       ],
@@ -878,7 +878,7 @@
           "name": "high_sigmas",
           "type": "SIGMAS",
           "links": [
-            60
+            78
           ]
         },
         {
@@ -926,7 +926,7 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 56
+          "link": 68
         },
         {
           "name": "vae",
@@ -1070,8 +1070,8 @@
           "name": "SAMPLER",
           "type": "SAMPLER",
           "links": [
-            52,
-            59
+            71,
+            76
           ]
         }
       ],
@@ -1265,7 +1265,7 @@
         {
           "name": "samples",
           "type": "LATENT",
-          "link": 55
+          "link": 67
         },
         {
           "name": "vae",
@@ -1390,7 +1390,7 @@
           "name": "GUIDER",
           "type": "GUIDER",
           "links": [
-            58
+            75
           ]
         }
       ],
@@ -1476,8 +1476,8 @@
           "name": "NOISE",
           "type": "NOISE",
           "links": [
-            50,
-            57
+            73,
+            74
           ]
         }
       ],
@@ -1531,7 +1531,7 @@
           "name": "GUIDER",
           "type": "GUIDER",
           "links": [
-            51
+            72
           ]
         }
       ],
@@ -1577,7 +1577,7 @@
           "name": "SIGMAS",
           "type": "SIGMAS",
           "links": [
-            53
+            70
           ]
         }
       ],
@@ -1677,7 +1677,7 @@
         48.43467905382113
       ],
       "flags": {},
-      "order": 31,
+      "order": 30,
       "mode": 0,
       "inputs": [
         {
@@ -2060,155 +2060,6 @@
       }
     },
     {
-      "id": 39,
-      "type": "H3TemporalSampler",
-      "pos": [
-        2663.725828749248,
-        4706.622528840452
-      ],
-      "size": [
-        247.8776969820915,
-        246.4346039398115
-      ],
-      "flags": {},
-      "order": 34,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "noise",
-          "type": "NOISE",
-          "link": 50
-        },
-        {
-          "name": "guider",
-          "type": "GUIDER",
-          "link": 51
-        },
-        {
-          "name": "sampler",
-          "type": "SAMPLER",
-          "link": 52
-        },
-        {
-          "name": "sigmas",
-          "type": "SIGMAS",
-          "link": 53
-        },
-        {
-          "name": "latent_image",
-          "type": "LATENT",
-          "link": 54
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "LATENT",
-          "links": [
-            55,
-            56
-          ]
-        },
-        {
-          "name": "denoised_output",
-          "type": "LATENT",
-          "links": null
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "H3TemporalSampler"
-      },
-      "widgets_values": [
-        true,
-        3,
-        false,
-        10,
-        "adaptive"
-      ],
-      "widgets_values_named": {
-        "enable": true,
-        "num_segments": 3,
-        "smart_bounds": false,
-        "overlap_frames": 10,
-        "blend_mode": "adaptive"
-      }
-    },
-    {
-      "id": 41,
-      "type": "H3TemporalSampler",
-      "pos": [
-        1642.4415437115106,
-        4715.883515170502
-      ],
-      "size": [
-        247.8776969820915,
-        246.4346039398115
-      ],
-      "flags": {},
-      "order": 26,
-      "mode": 0,
-      "inputs": [
-        {
-          "name": "noise",
-          "type": "NOISE",
-          "link": 57
-        },
-        {
-          "name": "guider",
-          "type": "GUIDER",
-          "link": 58
-        },
-        {
-          "name": "sampler",
-          "type": "SAMPLER",
-          "link": 59
-        },
-        {
-          "name": "sigmas",
-          "type": "SIGMAS",
-          "link": 60
-        },
-        {
-          "name": "latent_image",
-          "type": "LATENT",
-          "link": 61
-        }
-      ],
-      "outputs": [
-        {
-          "name": "output",
-          "type": "LATENT",
-          "links": []
-        },
-        {
-          "name": "denoised_output",
-          "type": "LATENT",
-          "links": [
-            62,
-            63,
-            65
-          ]
-        }
-      ],
-      "properties": {
-        "Node name for S&R": "H3TemporalSampler"
-      },
-      "widgets_values": [
-        false,
-        4,
-        true,
-        10,
-        "adaptive"
-      ],
-      "widgets_values_named": {
-        "enable": false,
-        "num_segments": 4,
-        "smart_bounds": true,
-        "overlap_frames": 10,
-        "blend_mode": "adaptive"
-      }
-    },
-    {
       "id": 43,
       "type": "H3LatentCache",
       "pos": [
@@ -2220,13 +2071,13 @@
         106
       ],
       "flags": {},
-      "order": 29,
+      "order": 27,
       "mode": 0,
       "inputs": [
         {
           "name": "latent",
           "type": "LATENT",
-          "link": 65
+          "link": 79
         }
       ],
       "outputs": [
@@ -2251,6 +2102,167 @@
         "filename_prefix": "h3_stage2_latent",
         "latent_file": "1SingPDMD.h3latent.pt"
       }
+    },
+    {
+      "id": 45,
+      "type": "H3TemporalSampler",
+      "pos": [
+        2648.8320188193197,
+        4669.94413498061
+      ],
+      "size": [
+        272.064453125,
+        282
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 73
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 72
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 71
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 70
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 69
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": [
+            67,
+            68
+          ]
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": null
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "H3TemporalSampler"
+      },
+      "widgets_values": [
+        true,
+        4,
+        false,
+        5,
+        "multiband",
+        true,
+        2
+      ],
+      "widgets_values_named": {
+        "Enable": true,
+        "Num Segments": 4,
+        "Smart Bounds": false,
+        "Overlap Frames": 5,
+        "Blend Mode": "multiband",
+        "Seam Lock": true,
+        "Seam Lock Frames": 2
+      },
+      "color": "#233",
+      "bgcolor": "#355"
+    },
+    {
+      "id": 46,
+      "type": "H3TemporalSampler",
+      "pos": [
+        1620.8813181097826,
+        4698.200594737453
+      ],
+      "size": [
+        272.064453125,
+        282
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "noise",
+          "type": "NOISE",
+          "link": 74
+        },
+        {
+          "name": "guider",
+          "type": "GUIDER",
+          "link": 75
+        },
+        {
+          "name": "sampler",
+          "type": "SAMPLER",
+          "link": 76
+        },
+        {
+          "name": "sigmas",
+          "type": "SIGMAS",
+          "link": 78
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 77
+        }
+      ],
+      "outputs": [
+        {
+          "name": "output",
+          "type": "LATENT",
+          "links": []
+        },
+        {
+          "name": "denoised_output",
+          "type": "LATENT",
+          "links": [
+            79,
+            80,
+            81
+          ]
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "H3TemporalSampler"
+      },
+      "widgets_values": [
+        false,
+        4,
+        false,
+        5,
+        "multiband",
+        true,
+        2
+      ],
+      "widgets_values_named": {
+        "Enable": false,
+        "Num Segments": 4,
+        "Smart Bounds": false,
+        "Overlap Frames": 5,
+        "Blend Mode": "multiband",
+        "Seam Lock": true,
+        "Seam Lock Frames": 2
+      },
+      "color": "#233",
+      "bgcolor": "#355"
     }
   ],
   "links": [
@@ -2415,126 +2427,6 @@
       "MODEL"
     ],
     [
-      50,
-      31,
-      0,
-      39,
-      0,
-      "NOISE"
-    ],
-    [
-      51,
-      32,
-      0,
-      39,
-      1,
-      "GUIDER"
-    ],
-    [
-      52,
-      18,
-      0,
-      39,
-      2,
-      "SAMPLER"
-    ],
-    [
-      53,
-      33,
-      0,
-      39,
-      3,
-      "SIGMAS"
-    ],
-    [
-      54,
-      10,
-      0,
-      39,
-      4,
-      "LATENT"
-    ],
-    [
-      55,
-      39,
-      0,
-      25,
-      0,
-      "LATENT"
-    ],
-    [
-      56,
-      39,
-      0,
-      14,
-      0,
-      "LATENT"
-    ],
-    [
-      57,
-      31,
-      0,
-      41,
-      0,
-      "NOISE"
-    ],
-    [
-      58,
-      29,
-      0,
-      41,
-      1,
-      "GUIDER"
-    ],
-    [
-      59,
-      18,
-      0,
-      41,
-      2,
-      "SAMPLER"
-    ],
-    [
-      60,
-      13,
-      0,
-      41,
-      3,
-      "SIGMAS"
-    ],
-    [
-      61,
-      11,
-      1,
-      41,
-      4,
-      "LATENT"
-    ],
-    [
-      62,
-      41,
-      1,
-      7,
-      0,
-      "LATENT"
-    ],
-    [
-      63,
-      41,
-      1,
-      8,
-      0,
-      "LATENT"
-    ],
-    [
-      65,
-      41,
-      1,
-      43,
-      0,
-      "LATENT"
-    ],
-    [
       66,
       43,
       0,
@@ -2637,6 +2529,126 @@
       26,
       1,
       "FLOAT"
+    ],
+    [
+      67,
+      45,
+      0,
+      25,
+      0,
+      "LATENT"
+    ],
+    [
+      68,
+      45,
+      0,
+      14,
+      0,
+      "LATENT"
+    ],
+    [
+      69,
+      10,
+      0,
+      45,
+      4,
+      "LATENT"
+    ],
+    [
+      70,
+      33,
+      0,
+      45,
+      3,
+      "SIGMAS"
+    ],
+    [
+      71,
+      18,
+      0,
+      45,
+      2,
+      "SAMPLER"
+    ],
+    [
+      72,
+      32,
+      0,
+      45,
+      1,
+      "GUIDER"
+    ],
+    [
+      73,
+      31,
+      0,
+      45,
+      0,
+      "NOISE"
+    ],
+    [
+      74,
+      31,
+      0,
+      46,
+      0,
+      "NOISE"
+    ],
+    [
+      75,
+      29,
+      0,
+      46,
+      1,
+      "GUIDER"
+    ],
+    [
+      76,
+      18,
+      0,
+      46,
+      2,
+      "SAMPLER"
+    ],
+    [
+      77,
+      11,
+      1,
+      46,
+      4,
+      "LATENT"
+    ],
+    [
+      78,
+      13,
+      0,
+      46,
+      3,
+      "SIGMAS"
+    ],
+    [
+      79,
+      46,
+      1,
+      43,
+      0,
+      "LATENT"
+    ],
+    [
+      80,
+      46,
+      1,
+      7,
+      0,
+      "LATENT"
+    ],
+    [
+      81,
+      46,
+      1,
+      8,
+      0,
+      "LATENT"
     ]
   ],
   "groups": [
@@ -2729,10 +2741,10 @@
   "extra": {
     "ue_links": [],
     "ds": {
-      "scale": 0.6316771145038462,
+      "scale": 0.8407622394046196,
       "offset": [
-        -484.9979368007167,
-        -4088.3522171909135
+        -1570.3062674053267,
+        -4195.595992518346
       ]
     },
     "frontendVersion": "1.53.6",
