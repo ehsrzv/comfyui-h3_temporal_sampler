@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-h3-temporal-sampler"
 version = "1.5"
-description = "Tiled sampling and nested-latent caching for MiniMax H3 audio-video generation"
+description = "Segmented sampling and nested-latent caching for MiniMax H3 audio-video generation"
 readme = "README.md"
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
