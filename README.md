@@ -8,9 +8,7 @@ denoise them consistently, and cache latents between runs.
 
 > This node is optimized for increasing output size (up to 2K and beyond), but
 > it can also be used for longer videos — working around VRAM limits at the cost
-> of longer render times. In practice, the author has used it to upscale up to 4K
-> — more would be possible, but MiniMax gains little from upscaling past that
-> point.
+> of longer render times.
 
 ## Nodes
 
