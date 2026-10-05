@@ -25,11 +25,6 @@ each fits in VRAM, denoises each segment, and joins them seamlessly.
 | Widget | Type | Default | Notes |
 |---|---|---|---|
 | enable | BOOLEAN | True | OFF = one plain pass over the full latent, like SamplerCustomAdvanced. |
-| noise | NOISE | — | Full-length noise field; sliced per segment so overlaps share identical initial noise. |
-| guider | GUIDER | — | Conditioning guider, applied identically to every segment. |
-| sampler | SAMPLER | — | Sampler algorithm used for every segment. |
-| sigmas | SIGMAS | — | Sigma schedule; identical for every segment so the segments match. |
-| latent_image | LATENT | — | Full-length H3 AV latent (nested video + audio). |
 | num_segments | INT | 4 | 1–10. How many overlapping segments to split the latent into — more segments fit larger sizes in VRAM. |
 | smart_bounds | BOOLEAN | False | ON = place boundaries at motion valleys (low-motion points) instead of even spacing. Falls back to even spacing if infeasible. |
 | overlap_frames | INT | 5 | 5–20, snapped to multiples of 5. Overlap between neighbours. Larger = smoother joins, more compute. |
