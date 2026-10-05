@@ -405,6 +405,10 @@ class H3TemporalSampler:
     Outputs: output (LATENT), denoised_output (LATENT).
     """
 
+    DESCRIPTION = ("This node is optimized for increasing output size (up to 2K), "
+                     "but it can also be used for longer videos \u2014 working around "
+                     "VRAM limits at the cost of longer render times.")
+
     @classmethod
     def INPUT_TYPES(cls):
         return {
