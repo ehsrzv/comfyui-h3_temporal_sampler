@@ -6,7 +6,7 @@ ComfyUI custom nodes for seamless high-resolution MiniMax H3 video generation. S
 an H3 audio-video latent that exceeds your VRAM into overlapping segments,
 denoise them consistently, and cache latents between runs.
 
-> This node is optimized for increasing output size (up to 2K and beyond), but
+> This node is optimized for increasing output size (up to 2K), but
 > it can also be used for longer videos — working around VRAM limits at the cost
 > of longer render times.
 
