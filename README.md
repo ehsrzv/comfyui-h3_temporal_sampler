@@ -20,6 +20,10 @@ Segmented `SamplerCustomAdvanced` for H3 AV latents. Splits the latent into
 overlapping time segments (grid-snapped to multiples of 5 latent frames) so
 each fits in VRAM, denoises each segment, and joins them seamlessly.
 
+> **Designed for Stage 2.** This node targets the high-resolution second
+> stage. For Stage 1 (shorter, lower resolution), a single plain pass
+> without tiling is recommended instead.
+
 **Inputs**
 
 | Widget | Type | Default | Notes |
