@@ -84,7 +84,7 @@ Texture check across the segment boundaries: facial skin tone and lighting stay 
 
 ### Demo 2
 
-https://raw.githubusercontent.com/ehsrzv/comfyui-h3_temporal_sampler/main/assets/demo2.mp4
+![Demo 2](assets/demo2.mp4)
 
 Night cafe scene, muted (audio removed). Rendered with the H3 Temporal Sampler.
 
