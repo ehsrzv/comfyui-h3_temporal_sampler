@@ -84,7 +84,7 @@ Texture check across the segment boundaries: facial skin tone and lighting stay 
 
 ### Demo 2
 
-![Demo 2](assets/demo2.mp4)
+https://github.com/user-attachments/assets/ddec78df-2b69-4a70-8736-bf818d5aec30
 
 Night cafe scene, muted (audio removed). Rendered with the H3 Temporal Sampler.
 
