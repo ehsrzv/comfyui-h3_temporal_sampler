@@ -82,6 +82,12 @@ Sample render — Stage 1 was short enough for a single pass, no Temporal Sample
 
 Texture check across the segment boundaries: facial skin tone and lighting stay continuous, the tie's dot pattern keeps its size, spacing and alignment, and the jacket's houndstooth weave shows no breaks — only natural singing motion.
 
+### Demo 2
+
+https://raw.githubusercontent.com/ehsrzv/comfyui-h3_temporal_sampler/main/assets/demo2.mp4
+
+Night cafe scene, muted (audio removed). Rendered with the H3 Temporal Sampler.
+
 ### H3 Latent Cache (Save/Load)
 
 Save and load H3 nested latents. ComfyUI's core Save/Load Latent nodes
