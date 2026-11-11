@@ -8,6 +8,9 @@ build/
 # ComfyUI
 web/extensions/node_modules/
 
+# Fetched assets (not source — fetch with scripts/download_assets.py)
+assets/lms_curve.bin
+
 # OS
 .DS_Store
 Thumbs.db

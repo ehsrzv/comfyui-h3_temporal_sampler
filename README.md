@@ -88,6 +88,36 @@ https://github.com/user-attachments/assets/ddec78df-2b69-4a70-8736-bf818d5aec30
 
 Night cafe scene, muted (audio removed). Rendered in 4 segments (overlap 5, Seam Lock Frames 2) with the H3 Temporal Sampler.
 
+### H3 IC Loader
+
+Applies the three original official
+[Open-H3-Regenerate-2K-IC](https://huggingface.co/Efficient-Large-Model/Open-H3-Regenerate-2K-IC)
+LoRAs (IC + HyperFlow 8-step + LMS Sharp) to a native non-pruned Ref2VA MODEL,
+including HyperFlow two-time conditioning and the 50 Sharp curve branches.
+Returns MODEL only — pair it with H3 Temporal Sampler for the Stage 2 refine.
+
+**Inputs**
+
+| Widget | Type | Default | Notes |
+|---|---|---|---|
+| model | MODEL | — | Non-pruned Ref2VA base (e.g. Singularity v2 INT8). |
+| ic_lora | LoRA file | `open_h3_regenerate_2k_ic_lora.safetensors` | Official IC LoRA, original FP32 file. |
+| hyperflow_lora | LoRA file | `minimax_h3_hyperflow_8step_v1.0.safetensors` | Official HyperFlow 8-step. |
+| sharp_lora | LoRA file | `minimax_h3_lms_v1.0_r64.safetensors` | Official LMS Sharp. |
+| sharp_strength | FLOAT | 1.0 | 0 disables Sharp entirely. |
+| lora_dtype | COMBO | bf16 | IC/Sharp factor storage in RAM. |
+
+**What it deliberately does NOT do:** no memory chunking and no attention
+override (no `token_chunk` / `head_chunk` / `key_chunk`, no `sdpa` / `online`
+choice) — your own attention and chunk nodes govern the model; no SIGMAS
+output and no sampler choice — feed sigmas from your own source (e.g.
+MiniMaxH3SigmaShift) into H3 Temporal Sampler.
+
+**Setup:** the loader needs the Sharp curve asset, which is not shipped in
+git. Fetch it once with `python scripts/download_assets.py` (pure stdlib,
+downloads only the 32 KB curve by byte range, SHA256-verified), or copy an
+existing `lms_curve.bin` into `assets/`.
+
 ### H3 Latent Cache (Save/Load)
 
 Save and load H3 nested latents. ComfyUI's core Save/Load Latent nodes
@@ -150,6 +180,10 @@ No extra dependencies — only ComfyUI itself and a MiniMax H3 setup.
 Example workflow based on the workflow templates from
 [LBH-123-AI/Minimax_h3_latent_Upscaler](https://huggingface.co/LBH-123-AI/Minimax_h3_latent_Upscaler)
 (Apache-2.0).
+
+H3 IC Loader recipe code vendored from
+[kkget/ComfyUI-Open-H3-Regenerate-IC](https://github.com/kkget/ComfyUI-Open-H3-Regenerate-IC)
+(Apache-2.0), with the chunking, attention and sigma output removed.
 
 ## License
 
