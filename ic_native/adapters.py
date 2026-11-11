@@ -1,8 +1,9 @@
 """Official IC + HyperFlow + LMS Sharp, applied through ModelPatcher clones.
 
-Vendored from kkget/ComfyUI-Open-H3-Regenerate-IC (Apache-2.0); the only
-changes are the import path (..vendor -> ..ic_vendor) and the missing-curve
-hint (scripts/download_assets.py)."""
+Vendored from kkget/ComfyUI-Open-H3-Regenerate-IC (Apache-2.0); changes vs
+upstream: import path (..vendor -> ..ic_vendor), missing-curve hint
+(scripts/download_assets.py), and the sigma grid removed — apply_recipe
+returns the model only, no sigmas, no sampler choice."""
 from __future__ import annotations
 
 import hashlib
@@ -15,7 +16,6 @@ from safetensors import safe_open
 
 from ..ic_vendor.hyperflow.keys import convert
 from ..ic_vendor.hyperflow.patch import apply_hyperflow, check_model, _check_shapes
-from ..ic_vendor.hyperflow.schedule import shift_sigmas
 
 CURVE_SHA256 = "c02a6c11888297688c1e6278185ea1f947023acfc69f9003bbcdcec9a229a8e7"
 ASSETS = Path(__file__).resolve().parents[1] / "assets"
@@ -136,7 +136,7 @@ def apply_sharp(model, path, strength=1.0, dtype=torch.bfloat16, table=None):
     return out
 
 
-def apply_recipe(model, ic, hyperflow, sharp, sharp_strength=1.0, dtype=torch.bfloat16, sampler="up3"):
+def apply_recipe(model, ic, hyperflow, sharp, sharp_strength=1.0, dtype=torch.bfloat16):
     check_model(model)
     out = apply_hyperflow(model, str(hyperflow))
     out = apply_sharp(out, sharp, sharp_strength, dtype)
@@ -144,7 +144,4 @@ def apply_recipe(model, ic, hyperflow, sharp, sharp_strength=1.0, dtype=torch.bf
     meta = out.model_options["hyperflow"]
     if meta["video_shift"] != 12.0 or meta["audio_shift"] != 3.0:
         raise ValueError("The official IC recipe requires HyperFlow shifts 12 (video) and 3 (audio)")
-    grid = shift_sigmas(meta["sigmas"], meta["video_shift"])
-    grid = grid if sampler == "hf8" else grid[-(int(sampler[-1]) + 1):]
-    out.model_options["open_h3_ic"] = {"sampler": sampler}
-    return out, torch.tensor(grid, dtype=torch.float32)
+    return out

@@ -54,11 +54,10 @@ class H3ICLoader:
         import torch
         from .ic_native.adapters import apply_recipe
         paths = [folder_paths.get_full_path_or_raise("loras", name) for name in (ic_lora, hyperflow_lora, sharp_lora)]
-        # apply_recipe also computes the official sigma grid, but it is discarded:
-        # this loader returns MODEL only; sigmas are supplied by your own source.
-        # "up3" is only the recipe label stored in model_options["open_h3_ic"].
-        model, _sigmas = apply_recipe(model, *paths, sharp_strength=sharp_strength,
-            dtype=torch.bfloat16 if lora_dtype == "bf16" else torch.float32, sampler="up3")
+        # No sigmas here: this loader returns MODEL only; sigmas are supplied
+        # by your own source (e.g. ManualSigmas into H3 Temporal Sampler).
+        model = apply_recipe(model, *paths, sharp_strength=sharp_strength,
+            dtype=torch.bfloat16 if lora_dtype == "bf16" else torch.float32)
         return (model,)
 
 
