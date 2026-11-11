@@ -40,14 +40,15 @@ class H3ICLoader:
             "sharp_strength": ("FLOAT", {"default": 1.0, "min": 0.0, "max": 2.0, "step": .05}),
             "lora_dtype": (["bf16", "fp32"], {"default": "bf16", "tooltip": "IC/Sharp factor storage in RAM; bf16 halves the FP32 IC file's RAM footprint."}),
         }}
-    RETURN_TYPES = ("MODEL",)
-    RETURN_NAMES = ("model",)
+    RETURN_TYPES = ("MODEL", "STRING")
+    RETURN_NAMES = ("model", "report")
     FUNCTION = "load"
     CATEGORY = CATEGORY
     DESCRIPTION = ("Apply the three original official IC LoRAs to a native non-pruned Ref2VA MODEL: "
                    "HyperFlow two-time conditioning and the 50 Sharp curve branches. "
                    "No memory chunking, no attention override, no SIGMAS output — "
-                   "your own attention/chunk nodes govern the model and sigmas come from your own source.")
+                   "your own attention/chunk nodes govern the model and sigmas come from your own source. "
+                   "Also returns a report string (printed to the console) listing the applied LoRAs and Sharp branches.")
 
     def load(self, model, ic_lora, hyperflow_lora, sharp_lora, sharp_strength, lora_dtype):
         import folder_paths
@@ -58,7 +59,21 @@ class H3ICLoader:
         # by your own source (e.g. ManualSigmas into H3 Temporal Sampler).
         model = apply_recipe(model, *paths, sharp_strength=sharp_strength,
             dtype=torch.bfloat16 if lora_dtype == "bf16" else torch.float32)
-        return (model,)
+        hf = model.model_options.get("hyperflow") or {}
+        vs, aus = hf.get("video_shift"), hf.get("audio_shift")
+        hf_note = f" (shifts {vs:g}/{aus:g})" if vs is not None and aus is not None else ""
+        curves = model.model_options.get("h3_ic_sharp_curves")
+        lines = ["[H3 IC Loader]"]
+        lines.append(f"  IC LoRA: {ic_lora} (strength 1.0)")
+        lines.append(f"  HyperFlow: {hyperflow_lora}{hf_note}")
+        if curves is None:
+            lines.append(f"  Sharp: {sharp_lora} (off, strength 0)")
+        else:
+            lines.append(f"  Sharp: {sharp_lora} ({curves} curve branches, strength {sharp_strength})")
+        lines.append(f"  dtype: {lora_dtype}")
+        report = "\n".join(lines)
+        print(report)
+        return (model, report)
 
 
 NODE_CLASS_MAPPINGS = {"H3ICLoader": H3ICLoader}

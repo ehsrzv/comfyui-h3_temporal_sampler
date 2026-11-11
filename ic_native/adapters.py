@@ -130,6 +130,7 @@ def apply_sharp(model, path, strength=1.0, dtype=torch.bfloat16, table=None):
             mapping[root] = key
     if curves != set(range(len(dm.blocks))):
         raise ValueError(f"Expected {len(dm.blocks)} Sharp curve branches, got {len(curves)}")
+    out.model_options["h3_ic_sharp_curves"] = len(curves)
     add_checked(out, linears, mapping, strength)
     forward = out.get_model_object("diffusion_model.time_embedder.forward")
     out.add_object_patch("diffusion_model.time_embedder.forward", context.record(forward))

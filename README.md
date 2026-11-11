@@ -107,6 +107,10 @@ Returns MODEL only — pair it with H3 Temporal Sampler for the Stage 2 refine.
 | sharp_strength | FLOAT | 1.0 | 0 disables Sharp entirely. |
 | lora_dtype | COMBO | bf16 | IC/Sharp factor storage in RAM. |
 
+**Outputs:** `model` (MODEL), `report` (STRING) — a short report of the applied
+LoRAs and Sharp curve branches, also printed to the console. Connect `report`
+to a text preview node to see it on the canvas.
+
 **What it deliberately does NOT do:** no memory chunking and no attention
 override (no `token_chunk` / `head_chunk` / `key_chunk`, no `sdpa` / `online`
 choice) — your own attention and chunk nodes govern the model; no SIGMAS
