@@ -163,6 +163,23 @@ Then restart ComfyUI.
 
 Search for `h3-temporal-sampler` in ComfyUI Manager and install.
 
+### Setup for H3 IC Loader
+
+The H3 IC Loader needs files the pack does not ship:
+
+1. The three official LoRAs in `ComfyUI/models/loras/` — download from
+   [Efficient-Large-Model/Open-H3-Regenerate-2K-IC](https://huggingface.co/Efficient-Large-Model/Open-H3-Regenerate-2K-IC/tree/main/lora):
+   `open_h3_regenerate_2k_ic_lora.safetensors`,
+   `minimax_h3_hyperflow_8step_v1.0.safetensors`,
+   `minimax_h3_lms_v1.0_r64.safetensors`.
+2. The Sharp curve asset — from the plugin folder, run
+   `python scripts/download_assets.py` (fetches only the 32 KB curve by byte
+   range, SHA256-verified), or copy an existing `lms_curve.bin` into the
+   pack's `assets/` folder.
+
+Without the curve asset the loader errors on first use; without the LoRAs its
+file pickers have nothing to load.
+
 ---
 
 After installation, find the nodes under the **h3 temporal sampler** category.
